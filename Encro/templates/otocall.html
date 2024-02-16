@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebRTC Video Call</title>
+    <style>
+        video {
+            max-width: 100%;
+            max-height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>WebRTC Video Call</h1>
+    <h3>Local Video</h3>
+    <video id="localVideo" autoplay playsinline muted></video>
+    <h3>Remote Video</h3>
+    <video id="remoteVideo" autoplay playsinline></video>
+
+    <button id="startButton">Start Call</button>
+    <button id="hangupButton" disabled>Hang Up</button>
+
+    {{ room_name|json_script:"room-name" }}
+    <script>
+        const localVideo = document.getElementById("localVideo");
+        const remoteVideo = document.getElementById("remoteVideo");
+        const startButton = document.getElementById("startButton");
+        const hangupButton = document.getElementById("hangupButton");
+
+        // Add your Django WebSocket URL here
+        const websocketURL = 'ws://'+ window.location.host + '/ws/direct/call'+ 'ra'+'/'
+
+        const configuration = {
+            'iceServers': [
+                { 'urls': 'stun:stun.l.google.com:19302' },
+            ]
+        };
+
+        const constraints = { 'video': true, 'audio': true };
+
+        let localStream;
+        let pc;
+        let socket;
+
+        startButton.addEventListener("click", startCall);
+        hangupButton.addEventListener("click", hangup);
+
+        async function startCall() {
+            localStream = await navigator.mediaDevices.getUserMedia(constraints);
+            localVideo.srcObject = localStream;
+
+            socket = new WebSocket(websocketURL);
+
+            socket.onopen = () => {
+                console.log("WebSocket connection opened");
+                createPeerConnection();
+            };
+
+            socket.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+
+                if (message.type === 'offer') {
+                    pc.setRemoteDescription(new RTCSessionDescription(message));
+                    answerCall();
+                } else if (message.type === 'answer') {
+                    pc.setRemoteDescription(new RTCSessionDescription(message));
+                } else if (message.type === 'icecandidate') {
+                    pc.addIceCandidate(new RTCIceCandidate(message.candidate));
+                }
+            };
+        }
+
+        function createPeerConnection() {
+            pc = new RTCPeerConnection(configuration);
+
+            pc.onicecandidate = (event) => {
+                if (event.candidate) {
+                    socket.send(JSON.stringify({ 'type': 'icecandidate', 'candidate': event.candidate }));
+                }
+            };
+
+            pc.ontrack = (event) => {
+                remoteVideo.srcObject = event.streams[0];
+            };
+
+            localStream.getTracks().forEach((track) => pc.addTrack(track, localStream));
+
+            pc.createOffer()
+                .then((offer) => {
+                    return pc.setLocalDescription(offer);
+                })
+                .then(() => {
+                    socket.send(JSON.stringify(pc.localDescription));
+                });
+        }
+
+        function answerCall() {
+            pc.createAnswer()
+                .then((answer) => {
+                    return pc.setLocalDescription(answer);
+                })
+                .then(() => {
+                    socket.send(JSON.stringify(pc.localDescription));
+                });
+        }
+
+        function hangup() {
+            pc.close();
+            socket.close();
+            remoteVideo.srcObject = null;
+        }
+    </script>
+</body>
+</html>

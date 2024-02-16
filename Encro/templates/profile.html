@@ -1,0 +1,30 @@
+<h1>{{ user_profile.user.username }}'s Profile</h1>
+<p>{{ user_profile.bio }}</p>
+<ul>
+    {% if user_profile.user == request.user %}
+        {% for request in friend_requests %}
+            <li>{{ request.from_user.username }} wants to follow you.
+                {% if request.status == 'pending' %}
+                    <a href="#">Accept</a> | <a href="#">Decline</a>
+                {% else %}
+                    <span>Pending</span>
+                {% endif %}
+            </li>
+        {% endfor %}
+    {% else %}
+        {% for request in friend_requests %}
+            {% if request.from_user == request.user and request.status == 'pending' %}
+                <li>Pending</li>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+</ul>
+
+
+
+{% if not user_profile.user == request.user %}
+    <form method="post" action="{% url 'Accounts:send_friend_request' user_profile.user.username %}">
+        {% csrf_token %}
+        <input type="submit" value="Send Friend Request">
+    </form>
+{% endif %}

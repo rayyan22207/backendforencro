@@ -1,0 +1,77 @@
+
+<body>
+    <div class="container-fluid">
+        <!-- Sidebar -->
+        <nav class=" bg-custom sidebar">
+            <div class="position-sticky d-flex align-items-center justify-content-center">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            Orders
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            Burger
+                        </a>
+                    </li>
+                    <!-- Add more menu items as needed -->
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <style>
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #f8f9fa;
+            width: 60px;
+        }
+
+        .container-fluid {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Make the container take the full height of the viewport */
+        }
+
+        .sidebar ul.nav {
+            padding-left: 0;
+        }
+
+        .sidebar .nav-link {
+            color: #979292;
+        }
+
+        .sidebar .nav-link.active {
+            font-weight: bold;
+        }
+
+        /* Custom background color for the sidebar */
+        .bg-custom {
+            background-color: #1e3044;
+            color: white;
+        }
+
+        /* Media query for screens smaller than 768px (phones) */
+        @media (max-width: 767px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                max-width: 100%;
+                margin-top: 20px;
+                flex-direction: row; /* Change the flex direction to horizontal */
+            }
+
+            .sidebar .nav-link {
+                padding-right: 20px; /* Add spacing between nav links */
+            }
+        }
+    </style>
+
+</body>

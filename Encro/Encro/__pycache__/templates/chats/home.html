@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<body>
+    <div id="chats-section">
+        <!-- Content from the 'chats' view will be loaded here -->
+    </div>
+    <div id="search-section">
+        <!-- Content from the 'search' view will be loaded here -->
+    </div>
+    <div id="profile-section">
+        <!-- Content from the 'profile' view will be loaded here -->
+    </div>
+    <div id="open-chat-section">
+        <!-- Content from the 'open-chat' view will be loaded here -->
+    </div>
+    <!-- Your other common content here -->
+</body>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#chats-section').load('http://127.0.0.1:8000/chats/', function (response, status, xhr) {
+            if (status == "error") {
+                console.log("Error loading content:", xhr.status, xhr.statusText);
+            }
+        });
+    });
+</script>
+
+{% endblock %}

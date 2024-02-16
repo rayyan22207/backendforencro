@@ -1,0 +1,17 @@
+<h1>Friend Requests</h1>
+<h2>Received Requests</h2>
+<ul>
+    {% for request in received_requests %}
+    <li>{{ request.from_user.username }} wants to follow you.
+        <a href="{% url 'Accounts:respond_to_friend_request' request.id 'accept' %}">Accept</a>
+        <a href="{% url 'Accounts:respond_to_friend_request' request.id 'decline' %}">Decline</a>
+    </li>
+    {% endfor %}
+    
+</ul>
+<h2>Sent Requests</h2>
+<ul>
+    {% for request in sent_requests %}
+        <li>You have sent a friend request to @<a href="#">{{ request.to_user.username }}</a>.</li>
+    {% endfor %}
+</ul>
